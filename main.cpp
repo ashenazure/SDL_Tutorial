@@ -18,6 +18,7 @@ const int SCREEN_HEIGHT = 480;
 //Set the wall
 SDL_Rect wall[10];
 int numWalls = 0;
+int inAir = 0;
 
 //Texture wrapper class
 class LTexture
@@ -297,7 +298,16 @@ void Dot::handleEvent( SDL_Event& e )
         switch( e.key.keysym.sym )
         {
                 //case SDLK_UP: mVelY -= DOT_VEL; break;
-            case SDLK_UP: mVelY = -15; break;
+            case SDLK_UP:
+                if ( inAir == 0 ) {
+                    mVelY = -15;
+                    inAir = 1;
+                }
+                else if ( inAir == 1 ) {
+                    mVelY = -15;
+                    inAir = 2;
+                }
+                break;
             case SDLK_DOWN: mVelY += DOT_VEL; break;
             case SDLK_LEFT: mVelX -= DOT_VEL; break;
             case SDLK_RIGHT: mVelX += DOT_VEL; break;
@@ -358,11 +368,12 @@ void Dot::move( SDL_Rect wall[] )
         mVelY = 1;
     }
     else if ( collidedY ) {
-        if ( mVelY < 0) {
+        if ( mVelY < 0) { // upward collision
             mPosY = wall[wallCollidedWith].y + wall[wallCollidedWith].h;
         }
-        else if ( mVelY > 0 ) {
+        else if ( mVelY > 0 ) { // downward collision
             mPosY = wall[wallCollidedWith].y - DOT_HEIGHT;
+            inAir = 0;
         }
         mCollider.y = mPosY;
         mVelY = 1;
@@ -371,6 +382,7 @@ void Dot::move( SDL_Rect wall[] )
         mPosY = LEVEL_HEIGHT - DOT_HEIGHT;
         mCollider.y = mPosY;
         mVelY = 1;
+        inAir = 0;
     }
     else {
         mVelY += 1;
@@ -568,6 +580,7 @@ int main( int argc, char* args[] )
             
             //The camera area
             SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+            SDL_Rect bgcam = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
             
             //Set the wall
             setWalls(40, 300, 400, 40);
@@ -576,6 +589,10 @@ int main( int argc, char* args[] )
             setWalls(0, 460, 600, 20);
             setWalls(300, 430, 30, 30);
             setWalls(800, 450, 400, 50);
+            setWalls(100, 800, 400, 50);
+            setWalls(0, 940, 600, 20);
+            setWalls(600, 650, 100, 100);
+            setWalls(20, 0, 1280, 20);
             
             //While application is running
             while( !quit )
@@ -623,7 +640,7 @@ int main( int argc, char* args[] )
                 SDL_RenderClear( gRenderer );
                 
                 //Render background bg
-                gBGTexture.render( 0, 0, &camera );
+                gBGTexture.render( 0, 0, &bgcam );
                 
                 //Render wall
                 SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
