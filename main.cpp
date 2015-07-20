@@ -19,6 +19,7 @@ const int SCREEN_HEIGHT = 480;
 SDL_Rect wall[10];
 int numWalls = 0;
 int inAir = 0;
+bool won = false;
 
 //Texture wrapper class
 class LTexture
@@ -75,7 +76,7 @@ public:
     static const int DOT_HEIGHT = 20;
     
     //Maximum axis velocity of the dot
-    static const int DOT_VEL = 10;
+    static const int DOT_VEL = 5;
     
     //Initializes the variables
     Dot();
@@ -84,7 +85,7 @@ public:
     void handleEvent( SDL_Event& e );
     
     //Moves the dot and checks collision
-    void move( SDL_Rect wall[] );
+    int move( SDL_Rect wall[] );
     
     //Shows the dot on the screen relative to the camera
     void render( int camX, int camY );
@@ -98,7 +99,7 @@ private:
     int mPosX, mPosY;
     
     //The velocity of the dot
-    int mVelX, mVelY;
+    float mVelX, mVelY;
     
     //Dot's collision box
     SDL_Rect mCollider;
@@ -121,6 +122,12 @@ SDL_Window* gWindow = NULL;
 
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
+
+//The surface contained by the window
+SDL_Surface* gScreenSurface = NULL;
+
+//The image we will load and show on the screen
+SDL_Surface* gHelloWorld = NULL;
 
 //Scene textures
 LTexture gDotTexture;
@@ -286,7 +293,7 @@ Dot::Dot()
     
     //Initialize the velocity
     mVelX = 0;
-    mVelY = 1;
+    mVelY = 0.5;
 }
 
 void Dot::handleEvent( SDL_Event& e )
@@ -300,11 +307,11 @@ void Dot::handleEvent( SDL_Event& e )
                 //case SDLK_UP: mVelY -= DOT_VEL; break;
             case SDLK_UP:
                 if ( inAir == 0 ) {
-                    mVelY = -15;
+                    mVelY = -10;
                     inAir = 1;
                 }
                 else if ( inAir == 1 ) {
-                    mVelY = -15;
+                    mVelY = -10;
                     inAir = 2;
                 }
                 break;
@@ -327,7 +334,7 @@ void Dot::handleEvent( SDL_Event& e )
     }
 }
 
-void Dot::move( SDL_Rect wall[] )
+int Dot::move( SDL_Rect wall[] )
 {
     //Move the dot left or right
     mPosX += mVelX;
@@ -365,7 +372,7 @@ void Dot::move( SDL_Rect wall[] )
         //Move back
         mPosY = 0;
         mCollider.y = mPosY;
-        mVelY = 1;
+        mVelY = 0.5;
     }
     else if ( collidedY ) {
         if ( mVelY < 0) { // upward collision
@@ -376,17 +383,18 @@ void Dot::move( SDL_Rect wall[] )
             inAir = 0;
         }
         mCollider.y = mPosY;
-        mVelY = 1;
+        mVelY = 0.5;
     }
     else if ( ( mPosY + DOT_HEIGHT > LEVEL_HEIGHT ) ) {
         mPosY = LEVEL_HEIGHT - DOT_HEIGHT;
         mCollider.y = mPosY;
-        mVelY = 1;
+        mVelY = 0.5;
         inAir = 0;
     }
     else {
-        mVelY += 1;
+        mVelY += 0.5;
     }
+    return wallCollidedWith;
 }
 
 void Dot::render( int camX, int camY )
@@ -484,6 +492,11 @@ bool loadMedia()
 
 void close()
 {
+    if ( won ) {
+        //Deallocate surface
+        SDL_FreeSurface( gHelloWorld );
+        gHelloWorld = NULL;
+    }
     //Free loaded images
     gDotTexture.free();
     gBGTexture.free(); // bg
@@ -571,6 +584,8 @@ int main( int argc, char* args[] )
         {
             //Main loop flag
             bool quit = false;
+            bool positive = true;
+            int a;
             
             //Event handler
             SDL_Event e;
@@ -611,7 +626,19 @@ int main( int argc, char* args[] )
                 }
                 
                 //Move the dot and check collision
-                dot.move( wall );
+                a = dot.move( wall );
+                if ( wall[5].x <= 200 ) {
+                    positive = true;
+                }
+                else if ( wall[5].x >= 1000 ) {
+                    positive = false;
+                }
+                if ( positive ) {
+                    wall[5].x += 1;
+                }
+                else {
+                    wall[5].x -= 1;
+                }
                 
                 //Center the camera over the dot
                 camera.x = ( dot.getPosX() + Dot::DOT_WIDTH / 2 ) - SCREEN_WIDTH / 2;
@@ -658,8 +685,29 @@ int main( int argc, char* args[] )
                 
                 //Update screen
                 SDL_RenderPresent( gRenderer );
+                if ( a == 8 ) {
+                    quit = true;
+                    won = true;
+                }
             }
         }
+    }
+    
+    if ( won ) {
+        gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+        gScreenSurface = SDL_GetWindowSurface( gWindow );
+        gHelloWorld = SDL_LoadBMP( "hello_world.bmp" );
+        
+        //Apply the image
+        SDL_BlitSurface( gHelloWorld, NULL, gScreenSurface, NULL );
+        
+        //Update the surface
+        SDL_UpdateWindowSurface( gWindow );
+        
+        //Wait two seconds
+        SDL_Delay( 2000 );
+
+        
     }
     
     //Free resources and close SDL
