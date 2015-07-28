@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string>
 #include "ltexture.h"
-#include "header.h"
 #include "dot.h"
 
 Dot::Dot()
@@ -122,7 +121,7 @@ int Dot::move( SDL_Rect wall[] )
     return wallCollidedWith;
 }
 
-void Dot::render( int camX, int camY )
+void Dot::render( int camX, int camY, LTexture gDotTexture )
 {
     //Show the dot relative to the camera
     gDotTexture.render( mPosX - camX, mPosY - camY );
@@ -138,7 +137,7 @@ int Dot::getPosY()
     return mPosY;
 }
 
-bool checkCollision( SDL_Rect a, SDL_Rect b )
+bool Dot::checkCollision( SDL_Rect a, SDL_Rect b )
 {
     //The sides of the rectangles
     int leftA, leftB;

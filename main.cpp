@@ -6,7 +6,6 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <string>
-#include "header.h"
 #include "ltexture.h"
 #include "dot.h"
 
@@ -39,6 +38,13 @@ void close();
 
 //Box collision detector
 //bool checkCollision( SDL_Rect a, SDL_Rect b );
+
+//The window renderer
+SDL_Renderer* gRenderer = NULL;
+
+//Scene textures
+LTexture gDotTexture;
+LTexture gBGTexture; //bg
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -110,14 +116,14 @@ bool loadMedia()
     
     //Load press texture
     //if( !gDotTexture.loadFromFile( "27_collision_detection/dot.bmp" ) )
-    if( !gDotTexture.loadFromFile( "dot.bmp" ) )
+    if( !gDotTexture.loadFromFile( "dot.bmp", gRenderer ) )
     {
         printf( "Failed to load dot texture!\n" );
         success = false;
     }
     
     //Load background texture bg
-    if( !gBGTexture.loadFromFile( "Cat.png" ) )
+    if( !gBGTexture.loadFromFile( "Cat.png", gRenderer ) )
     {
         printf( "Failed to load background texture!\n" );
         success = false;
@@ -259,7 +265,7 @@ int main( int argc, char* args[] )
                 SDL_RenderClear( gRenderer );
                 
                 //Render background bg
-                gBGTexture.render( 0, 0, &bgcam );
+                gBGTexture.render( 0, 0, &bgcam, gRenderer );
                 
                 //Render wall
                 SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
@@ -273,7 +279,7 @@ int main( int argc, char* args[] )
                 }
                 
                 //Render dot
-                dot.render( camera.x, camera.y );
+                dot.render( camera.x, camera.y, gDotTexture );
                 
                 //Update screen
                 SDL_RenderPresent( gRenderer );
