@@ -39,7 +39,7 @@ void Dot::handleEvent( SDL_Event& e )
                     inAir = 2;
                 }
                 break;
-            case SDLK_DOWN: mVelY += DOT_VEL; break;
+            	//case SDLK_DOWN: mVelY += DOT_VEL; break;
             case SDLK_LEFT: mVelX -= DOT_VEL; break;
             case SDLK_RIGHT: mVelX += DOT_VEL; break;
         }
@@ -51,7 +51,7 @@ void Dot::handleEvent( SDL_Event& e )
         switch( e.key.keysym.sym )
         {
                 //case SDLK_UP: mVelY += DOT_VEL; break;
-            case SDLK_DOWN: mVelY -= DOT_VEL; break;
+            	//case SDLK_DOWN: mVelY -= DOT_VEL; break;
             case SDLK_LEFT: mVelX += DOT_VEL; break;
             case SDLK_RIGHT: mVelX -= DOT_VEL; break;
         }

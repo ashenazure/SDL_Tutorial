@@ -225,6 +225,8 @@ int main( int argc, char* args[] )
                 
                 //Move the dot and check collision
                 a = dot.move( wall );
+
+				//Move wall #5
                 if ( wall[5].x <= 200 ) {
                     positive = true;
                 }
