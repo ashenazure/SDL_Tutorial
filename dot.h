@@ -21,7 +21,7 @@ public:
     int move( SDL_Rect wall[] );
     
     //Shows the dot on the screen relative to the camera
-    void render( int camX, int camY, LTexture gDotTexture );
+    void render( int camX, int camY, LTexture gDotTexture, SDL_Renderer* gRenderer );
     
     //Position accessors
     int getPosX();

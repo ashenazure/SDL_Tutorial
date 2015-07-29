@@ -121,10 +121,10 @@ int Dot::move( SDL_Rect wall[] )
     return wallCollidedWith;
 }
 
-void Dot::render( int camX, int camY, LTexture gDotTexture )
+void Dot::render( int camX, int camY, LTexture gDotTexture, SDL_Renderer* gRenderer )
 {
     //Show the dot relative to the camera
-    gDotTexture.render( mPosX - camX, mPosY - camY );
+    gDotTexture.render( mPosX - camX, mPosY - camY, NULL, gRenderer );
 }
 
 int Dot::getPosX()
