@@ -279,7 +279,7 @@ int main( int argc, char* args[] )
                 }
                 
                 //Render dot
-                dot.render( camera.x, camera.y, gDotTexture, gRenderer );
+                dot.render( camera.x, camera.y, &gDotTexture, gRenderer );
                 
                 //Update screen
                 SDL_RenderPresent( gRenderer );
