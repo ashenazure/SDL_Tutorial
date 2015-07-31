@@ -23,17 +23,9 @@ const int SCREEN_HEIGHT = 480;
 //Set the wall
 SDL_Rect wall[10];
 int numWalls = 0;
-<<<<<<< HEAD
-//int inAir = 0;
-bool won = false;
-
-=======
-
-//int inAir = 0;
 bool win = false;
 bool lose = false;
 
->>>>>>> 5b5033295197fd0c2c2a289a7dfb340d93d6ed5e
 //powerup animation
 const int POWERUP_ANIMATION_FRAMES = 4;
 SDL_Rect gPowerupClips[ POWERUP_ANIMATION_FRAMES ];
