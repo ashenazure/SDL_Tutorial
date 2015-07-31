@@ -39,7 +39,11 @@ void Dot::handleEvent( SDL_Event& e )
                     inAir = 2;
                 }
                 break;
-            	//case SDLK_DOWN: mVelY += DOT_VEL; break;
+        ////case SDLK_DOWN: 
+		////	if ( inAir > 0 ) {
+		////		mVelY += 5;
+		////	}
+		////	break;
             case SDLK_LEFT: mVelX -= DOT_VEL; break;
             case SDLK_RIGHT: mVelX += DOT_VEL; break;
         }
@@ -66,14 +70,15 @@ int Dot::move( SDL_Rect wall[] )
     bool collidedX = false;
     bool collidedY = false;
     int wallCollidedWith = -1;
-    for (int i = 0; i < 10/*TOODOO*/; i++) {
+    for (int i = 0; i < 10/*TODO*/; i++) {
         if (checkCollision( mCollider, wall[i])) {
             collidedX = true;
+            wallCollidedWith = i;
         }
     }
     
     //If the dot collided or went too far to the left or right
-    if( ( mPosX < 0 ) || ( mPosX + DOT_WIDTH > 1280/*TOODOO*/ ) || collidedX )
+    if( ( mPosX < 0 ) || ( mPosX + DOT_WIDTH > 1280/*TODO*/ ) || collidedX )
     {
         //Move back
         mPosX -= mVelX;
@@ -83,7 +88,7 @@ int Dot::move( SDL_Rect wall[] )
     //Move the dot up or down
     mPosY += mVelY;
     mCollider.y = mPosY;
-    for (int i = 0; i < 10/*TOODOO*/; i++) {
+    for (int i = 0; i < 10/*TODO*/; i++) {
         if (checkCollision( mCollider, wall[i])) {
             collidedY = true;
             wallCollidedWith = i;
@@ -109,8 +114,8 @@ int Dot::move( SDL_Rect wall[] )
         mCollider.y = mPosY;
         mVelY = 0.5;
     }
-    else if ( ( mPosY + DOT_HEIGHT > 960/*TOODOO*/ ) ) {
-        mPosY = 960/*TOODOO*/ - DOT_HEIGHT;
+    else if ( ( mPosY + DOT_HEIGHT > 960/*TODO*/ ) ) {
+        mPosY = 960/*TODO*/ - DOT_HEIGHT;
         mCollider.y = mPosY;
         mVelY = 0.5;
         inAir = 0;

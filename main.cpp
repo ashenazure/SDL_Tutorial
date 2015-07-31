@@ -20,12 +20,13 @@ const int SCREEN_HEIGHT = 480;
 //Set the wall
 SDL_Rect wall[10];
 int numWalls = 0;
-int inAir = 0;
+//int inAir = 0;
 bool won = false;
 
-//Texture wrapper class
-
-//The dot that will move around on the screen
+//powerup animation
+const int POWERUP_ANIMATION_FRAMES = 4;
+SDL_Rect gPowerupClips[ POWERUP_ANIMATION_FRAMES ];
+LTexture gPowerupTexture;
 
 //Starts up SDL and creates window
 bool init();
@@ -35,9 +36,6 @@ bool loadMedia();
 
 //Frees media and shuts down SDL
 void close();
-
-//Box collision detector
-//bool checkCollision( SDL_Rect a, SDL_Rect b );
 
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
@@ -128,6 +126,36 @@ bool loadMedia()
         printf( "Failed to load background texture!\n" );
         success = false;
     }
+
+	//Load powerup texture
+	if( !gPowerupTexture.loadFromFile( "powerup.png", gRenderer ) )
+	{
+		printf( "Failed to load powerup animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		//set sprite clips
+		gPowerupClips[0].x = 0;
+		gPowerupClips[0].y = 0;
+		gPowerupClips[0].w = 20;
+		gPowerupClips[0].h = 20;
+
+		gPowerupClips[1].x = 20;
+		gPowerupClips[1].y = 0;
+		gPowerupClips[1].w = 20;
+		gPowerupClips[1].h = 20;
+
+		gPowerupClips[2].x = 40;
+		gPowerupClips[2].y = 0;
+		gPowerupClips[2].w = 20;
+		gPowerupClips[2].h = 20;
+
+		gPowerupClips[3].x = 60;
+		gPowerupClips[3].y = 0;
+		gPowerupClips[3].w = 20;
+		gPowerupClips[3].h = 20;
+	}
     
     return success;
 }
@@ -184,6 +212,9 @@ int main( int argc, char* args[] )
             bool quit = false;
             bool positive = true;
             int a;
+
+			//animation frame
+			int frame = 0;
             
             //Event handler
             SDL_Event e;
@@ -282,7 +313,20 @@ int main( int argc, char* args[] )
                 
                 //Render dot
                 dot.render( camera.x, camera.y, &gDotTexture, gRenderer );
-                
+				
+                //Render current frame
+                SDL_Rect* currentClip = &gPowerupClips[ frame / 4 ];
+                gPowerupTexture.render( 50, 50, currentClip, gRenderer );
+				
+				//Go to next frame
+				++frame;
+
+				//cycle animation
+				if( frame / 4 >= POWERUP_ANIMATION_FRAMES )
+				{
+					frame = 0;
+				}
+
                 //Update screen
                 SDL_RenderPresent( gRenderer );
                 if ( a == 8 ) {
