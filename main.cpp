@@ -18,8 +18,8 @@ const int SCREEN_HEIGHT = 480;
 //Set the wall
 SDL_Rect wall[10];
 int numWalls = 0;
-int inAir = 0;
-bool won = false;
+bool win = false;
+bool lose = false;
 
 //Texture wrapper class
 class LTexture
@@ -85,7 +85,7 @@ public:
     void handleEvent( SDL_Event& e );
     
     //Moves the dot and checks collision
-    int move( SDL_Rect wall[] );
+    int move( SDL_Rect wall[]);
     
     //Shows the dot on the screen relative to the camera
     void render( int camX, int camY );
@@ -94,9 +94,14 @@ public:
     int getPosX();
     int getPosY();
     
+    int getAir();
+    
 private:
     //The X and Y offsets of the dot
     int mPosX, mPosY;
+    
+    //Jump number tracker
+    int inAir;
     
     //The velocity of the dot
     float mVelX, mVelY;
@@ -334,7 +339,7 @@ void Dot::handleEvent( SDL_Event& e )
     }
 }
 
-int Dot::move( SDL_Rect wall[] )
+int Dot::move( SDL_Rect wall[])
 {
     //Move the dot left or right
     mPosX += mVelX;
@@ -372,7 +377,7 @@ int Dot::move( SDL_Rect wall[] )
         //Move back
         mPosY = 0;
         mCollider.y = mPosY;
-        mVelY = 0.5;
+        mVelY = 0.5; // top of screen acts like a wall
     }
     else if ( collidedY ) {
         if ( mVelY < 0) { // upward collision
@@ -411,6 +416,11 @@ int Dot::getPosX()
 int Dot::getPosY()
 {
     return mPosY;
+}
+
+int Dot::getAir()
+{
+    return inAir;
 }
 
 bool init()
@@ -473,7 +483,6 @@ bool loadMedia()
     bool success = true;
     
     //Load press texture
-    //if( !gDotTexture.loadFromFile( "27_collision_detection/dot.bmp" ) )
     if( !gDotTexture.loadFromFile( "dot.bmp" ) )
     {
         printf( "Failed to load dot texture!\n" );
@@ -492,7 +501,12 @@ bool loadMedia()
 
 void close()
 {
-    if ( won ) {
+    if ( win ) {
+        //Deallocate surface
+        SDL_FreeSurface( gHelloWorld );
+        gHelloWorld = NULL;
+    }
+    if ( lose ) {
         //Deallocate surface
         SDL_FreeSurface( gHelloWorld );
         gHelloWorld = NULL;
@@ -566,6 +580,33 @@ void setWalls( int x, int y, int w, int h )
     numWalls += 1;
 }
 
+SDL_Surface* loadSurface( std::string path )
+{
+    //The final optimized image
+    SDL_Surface* optimizedSurface = NULL;
+    
+    //Load image at specified path
+    SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
+    if( loadedSurface == NULL )
+    {
+        printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
+    }
+    else
+    {
+        //Convert surface to screen format
+        optimizedSurface = SDL_ConvertSurface( loadedSurface, gScreenSurface->format, NULL );
+        if( optimizedSurface == NULL )
+        {
+            printf( "Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
+        }
+        
+        //Get rid of old loaded surface
+        SDL_FreeSurface( loadedSurface );
+    }
+    
+    return optimizedSurface;
+}
+
 int main( int argc, char* args[] )
 {
     //Start up SDL and create window
@@ -607,7 +648,7 @@ int main( int argc, char* args[] )
             setWalls(100, 800, 400, 50);
             setWalls(0, 940, 600, 20);
             setWalls(600, 650, 100, 100);
-            setWalls(20, 0, 1280, 20);
+            //setWalls(20, 0, 1280, 20);
             
             //While application is running
             while( !quit )
@@ -687,16 +728,16 @@ int main( int argc, char* args[] )
                 SDL_RenderPresent( gRenderer );
                 if ( a == 8 ) {
                     quit = true;
-                    won = true;
+                    win = true;
                 }
             }
         }
     }
     
-    if ( won ) {
+    if ( win ) {
         gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
         gScreenSurface = SDL_GetWindowSurface( gWindow );
-        gHelloWorld = SDL_LoadBMP( "hello_world.bmp" );
+        gHelloWorld = loadSurface( "Win.png" );
         
         //Apply the image
         SDL_BlitSurface( gHelloWorld, NULL, gScreenSurface, NULL );
@@ -706,8 +747,21 @@ int main( int argc, char* args[] )
         
         //Wait two seconds
         SDL_Delay( 2000 );
-
+    }
+    
+    if ( lose ) {
+        gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+        gScreenSurface = SDL_GetWindowSurface( gWindow );
+        gHelloWorld = loadSurface( "Lose.png" );
         
+        //Apply the image
+        SDL_BlitSurface( gHelloWorld, NULL, gScreenSurface, NULL );
+        
+        //Update the surface
+        SDL_UpdateWindowSurface( gWindow );
+        
+        //Wait two seconds
+        SDL_Delay( 2000 );
     }
     
     //Free resources and close SDL
