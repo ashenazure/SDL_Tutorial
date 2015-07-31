@@ -1,5 +1,9 @@
 #include <SDL2/SDL.h>
+#ifdef __linux__
 #include <SDL2/SDL_image.h>
+#else __APPLE__ && __MACH__ 	
+#include <SDL2_image/SDL_image.h>
+#endif
 #include <stdio.h>
 #include <string>
 #include "ltexture.h"

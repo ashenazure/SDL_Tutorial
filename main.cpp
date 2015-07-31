@@ -2,8 +2,11 @@
  and may not be redistributed without written permission.*/
 
 //Using SDL, SDL_image, standard IO, and strings
-#include <SDL2/SDL.h>
+#ifdef __linux__
 #include <SDL2/SDL_image.h>
+#else __APPLE__ && __MACH__ 	
+#include <SDL2_image/SDL_image.h>
+#endif
 #include <stdio.h>
 #include <string>
 #include "ltexture.h"
@@ -20,9 +23,17 @@ const int SCREEN_HEIGHT = 480;
 //Set the wall
 SDL_Rect wall[10];
 int numWalls = 0;
+<<<<<<< HEAD
 //int inAir = 0;
 bool won = false;
 
+=======
+
+//int inAir = 0;
+bool win = false;
+bool lose = false;
+
+>>>>>>> 5b5033295197fd0c2c2a289a7dfb340d93d6ed5e
 //powerup animation
 const int POWERUP_ANIMATION_FRAMES = 4;
 SDL_Rect gPowerupClips[ POWERUP_ANIMATION_FRAMES ];
@@ -162,7 +173,12 @@ bool loadMedia()
 
 void close()
 {
-    if ( won ) {
+    if ( win ) {
+        //Deallocate surface
+        SDL_FreeSurface( gHelloWorld );
+        gHelloWorld = NULL;
+    }
+    if ( lose ) {
         //Deallocate surface
         SDL_FreeSurface( gHelloWorld );
         gHelloWorld = NULL;
@@ -190,6 +206,33 @@ void setWalls( int x, int y, int w, int h )
     wall[numWalls].w = w;
     wall[numWalls].h = h;
     numWalls += 1;
+}
+
+SDL_Surface* loadSurface( std::string path )
+{
+    //The final optimized image
+    SDL_Surface* optimizedSurface = NULL;
+    
+    //Load image at specified path
+    SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
+    if( loadedSurface == NULL )
+    {
+        printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
+    }
+    else
+    {
+        //Convert surface to screen format
+        optimizedSurface = SDL_ConvertSurface( loadedSurface, gScreenSurface->format, NULL );
+        if( optimizedSurface == NULL )
+        {
+            printf( "Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
+        }
+        
+        //Get rid of old loaded surface
+        SDL_FreeSurface( loadedSurface );
+    }
+    
+    return optimizedSurface;
 }
 
 int main( int argc, char* args[] )
@@ -236,7 +279,7 @@ int main( int argc, char* args[] )
             setWalls(100, 800, 400, 50);
             setWalls(0, 940, 600, 20);
             setWalls(600, 650, 100, 100);
-            setWalls(20, 0, 1280, 20);
+            //setWalls(20, 0, 1280, 20);
             
             //While application is running
             while( !quit )
@@ -331,16 +374,16 @@ int main( int argc, char* args[] )
                 SDL_RenderPresent( gRenderer );
                 if ( a == 8 ) {
                     quit = true;
-                    won = true;
+                    win = true;
                 }
             }
         }
     }
     
-    if ( won ) {
+    if ( win ) {
         gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
         gScreenSurface = SDL_GetWindowSurface( gWindow );
-        gHelloWorld = SDL_LoadBMP( "hello_world.bmp" );
+        gHelloWorld = loadSurface( "Win.png" );
         
         //Apply the image
         SDL_BlitSurface( gHelloWorld, NULL, gScreenSurface, NULL );
@@ -350,8 +393,21 @@ int main( int argc, char* args[] )
         
         //Wait two seconds
         SDL_Delay( 2000 );
-
+    }
+    
+    if ( lose ) {
+        gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+        gScreenSurface = SDL_GetWindowSurface( gWindow );
+        gHelloWorld = loadSurface( "Lose.png" );
         
+        //Apply the image
+        SDL_BlitSurface( gHelloWorld, NULL, gScreenSurface, NULL );
+        
+        //Update the surface
+        SDL_UpdateWindowSurface( gWindow );
+        
+        //Wait two seconds
+        SDL_Delay( 2000 );
     }
     
     //Free resources and close SDL
