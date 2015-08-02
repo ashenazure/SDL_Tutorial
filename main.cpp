@@ -39,13 +39,13 @@ void close();
 SDL_Renderer* gRenderer = NULL;
 
 //Scene textures
-LTexture gDotTexture(gRenderer);
-LTexture gBGTexture(gRenderer);
+LTexture gDotTexture;
+LTexture gBGTexture;
 
 //powerup animation
 const int POWERUP_ANIMATION_FRAMES = 4;
 SDL_Rect gPowerupClips[ POWERUP_ANIMATION_FRAMES ];
-LTexture gPowerupTexture(gRenderer);
+LTexture gPowerupTexture;
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
