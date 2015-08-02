@@ -14,6 +14,9 @@ public:
     //Initializes the variables
     Dot();
     
+	//Initializes variables and pointers
+	Dot(LTexture* texture);
+
     //Takes key presses and adjusts the dot's velocity
     void handleEvent( SDL_Event& e );
     
@@ -21,7 +24,7 @@ public:
     int move( SDL_Rect wall[] );
     
     //Shows the dot on the screen relative to the camera
-    void render( int camX, int camY, LTexture* gDotTexture, SDL_Renderer* gRenderer );
+    void render( int camX, int camY );
     
     //Position accessors
     int getPosX();
@@ -39,6 +42,9 @@ private:
     
     //Dot's collision box
     SDL_Rect mCollider;
+
+	//Pointer to dot texture
+	LTexture* gDotTexture;
 
 	//inair
 	int inAir = 0;

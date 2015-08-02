@@ -7,6 +7,8 @@ public:
     //Initializes variables
     LTexture();
     
+    LTexture( SDL_Renderer* gRenderer );
+    
     //Deallocates memory
     ~LTexture();
     
@@ -31,15 +33,24 @@ public:
     void setAlpha( Uint8 alpha );
     
     //Renders texture at given point
-    void render( int x, int y, SDL_Rect* clip = NULL, SDL_Renderer* gRenderer = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
+    void render( int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
     
     //Gets image dimensions
     int getWidth();
     int getHeight();
+
+	//Gets the renderer
+	SDL_Renderer* getRenderer();
+
+	//Set the renderer
+	void setRenderer(SDL_Renderer* renderer);
     
 private:
     //The actual hardware texture
     SDL_Texture* mTexture;
+
+	//Renderer used for texture
+	SDL_Renderer* gRenderer;
     
     //Image dimensions
     int mWidth;

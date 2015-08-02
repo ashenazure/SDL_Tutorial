@@ -22,6 +22,27 @@ Dot::Dot()
     //Initialize the velocity
     mVelX = 0;
     mVelY = 0.5;
+	
+	//Pointers not given; set to null
+	gDotTexture = NULL;
+}
+
+Dot::Dot(LTexture* texture)
+{
+    //Initialize the offsets
+    mPosX = 0;
+    mPosY = 0;
+    
+    //Set collision box dimension
+    mCollider.w = DOT_WIDTH;
+    mCollider.h = DOT_HEIGHT;
+    
+    //Initialize the velocity
+    mVelX = 0;
+    mVelY = 0.5;
+	
+	//Pointers not given; set to null
+	gDotTexture = texture;
 }
 
 void Dot::handleEvent( SDL_Event& e )
@@ -130,11 +151,11 @@ int Dot::move( SDL_Rect wall[] )
     return wallCollidedWith;
 }
 
-void Dot::render( int camX, int camY, LTexture* gDotTexture, SDL_Renderer* gRenderer )
+void Dot::render( int camX, int camY )
 {
     //Show the dot relative to the camera
-    SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
-    gDotTexture->render( mPosX - camX, mPosY - camY, NULL, gRenderer );
+    SDL_SetRenderDrawColor( gDotTexture->getRenderer(), 0x00, 0x00, 0x00, 0xFF );
+    gDotTexture->render( mPosX - camX, mPosY - camY );
 }
 
 int Dot::getPosX()

@@ -26,11 +26,6 @@ int numWalls = 0;
 bool win = false;
 bool lose = false;
 
-//powerup animation
-const int POWERUP_ANIMATION_FRAMES = 4;
-SDL_Rect gPowerupClips[ POWERUP_ANIMATION_FRAMES ];
-LTexture gPowerupTexture;
-
 //Starts up SDL and creates window
 bool init();
 
@@ -44,8 +39,13 @@ void close();
 SDL_Renderer* gRenderer = NULL;
 
 //Scene textures
-LTexture gDotTexture;
-LTexture gBGTexture; //bg
+LTexture gDotTexture(gRenderer);
+LTexture gBGTexture(gRenderer);
+
+//powerup animation
+const int POWERUP_ANIMATION_FRAMES = 4;
+SDL_Rect gPowerupClips[ POWERUP_ANIMATION_FRAMES ];
+LTexture gPowerupTexture(gRenderer);
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -95,6 +95,11 @@ bool init()
             {
                 //Initialize renderer color
                 SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+				
+				//reset the renderer for all textures
+				gDotTexture.setRenderer(gRenderer);
+				gBGTexture.setRenderer(gRenderer);
+				gPowerupTexture.setRenderer(gRenderer);
                 
                 //Initialize PNG loading
                 int imgFlags = IMG_INIT_PNG;
@@ -255,7 +260,7 @@ int main( int argc, char* args[] )
             SDL_Event e;
             
             //The dot that will be moving around on the screen
-            Dot dot;
+            Dot dot( &gDotTexture );
             
             //The camera area
             SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -333,7 +338,7 @@ int main( int argc, char* args[] )
                 SDL_RenderClear( gRenderer );
                 
                 //Render background bg
-                gBGTexture.render( 0, 0, &bgcam, gRenderer );
+                gBGTexture.render( 0, 0, &bgcam );
                 
                 //Render wall
                 SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
@@ -347,11 +352,11 @@ int main( int argc, char* args[] )
                 }
                 
                 //Render dot
-                dot.render( camera.x, camera.y, &gDotTexture, gRenderer );
+                dot.render( camera.x, camera.y );
 				
                 //Render current frame
                 SDL_Rect* currentClip = &gPowerupClips[ frame / 4 ];
-                gPowerupTexture.render( 50, 50, currentClip, gRenderer );
+                gPowerupTexture.render( 50, 50, currentClip );
 				
 				//Go to next frame
 				++frame;

@@ -14,6 +14,16 @@ LTexture::LTexture()
     mTexture = NULL;
     mWidth = 0;
     mHeight = 0;
+	gRenderer = NULL;
+}
+
+LTexture::LTexture( SDL_Renderer* renderer )
+{
+    //Initialize
+    mTexture = NULL;
+    mWidth = 0;
+    mHeight = 0;
+	gRenderer = renderer;
 }
 
 LTexture::~LTexture()
@@ -130,7 +140,7 @@ void LTexture::setAlpha( Uint8 alpha )
     SDL_SetTextureAlphaMod( mTexture, alpha );
 }
 
-void LTexture::render( int x, int y, SDL_Rect* clip, SDL_Renderer* gRenderer, double angle, SDL_Point* center, SDL_RendererFlip flip )
+void LTexture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
 {
     //Set rendering space and render to screen
     SDL_Rect renderQuad = { x, y, mWidth, mHeight };
@@ -154,4 +164,14 @@ int LTexture::getWidth()
 int LTexture::getHeight()
 {
     return mHeight;
+}
+
+SDL_Renderer* LTexture::getRenderer()
+{
+	return gRenderer;
+}
+
+void LTexture::setRenderer(SDL_Renderer* renderer)
+{
+	gRenderer = renderer;
 }

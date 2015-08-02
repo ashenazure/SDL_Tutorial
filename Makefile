@@ -17,3 +17,7 @@ OBJ_NAME = testformx
 #This is the target that compiles our executable
 all : $(OBJS)
 	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+
+#clean
+clean : 
+	rm testformx
