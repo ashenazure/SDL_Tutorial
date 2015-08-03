@@ -4,10 +4,13 @@
 //Using SDL, SDL_image, standard IO, and strings
 #ifdef __linux__
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #else __APPLE__ && __MACH__ 	
 #include <SDL2_image/SDL_image.h>
+#include <SDL2_ttf/SDL_ttf.h>
 #endif
 #include <stdio.h>
+#include <sstream>
 #include <string>
 #include "ltexture.h"
 #include "dot.h"
@@ -37,6 +40,12 @@ void close();
 
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
+
+//Globally used font
+TTF_Font *gFont = NULL;
+
+//Text texture
+LTexture gTextTexture;
 
 //Scene textures
 LTexture gDotTexture;
@@ -100,6 +109,7 @@ bool init()
 				gDotTexture.setRenderer(gRenderer);
 				gBGTexture.setRenderer(gRenderer);
 				gPowerupTexture.setRenderer(gRenderer);
+				gTextTexture.setRenderer(gRenderer);
                 
                 //Initialize PNG loading
                 int imgFlags = IMG_INIT_PNG;
@@ -108,6 +118,13 @@ bool init()
                     printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
                     success = false;
                 }
+
+				//Initialize SDL_ttf
+				if( TTF_Init() == -1 )
+				{
+					printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
+					success = false;
+				}
             }
         }
     }
@@ -121,7 +138,6 @@ bool loadMedia()
     bool success = true;
     
     //Load press texture
-    //if( !gDotTexture.loadFromFile( "27_collision_detection/dot.bmp" ) )
     if( !gDotTexture.loadFromFile( "dot.bmp", gRenderer ) )
     {
         printf( "Failed to load dot texture!\n" );
@@ -165,6 +181,24 @@ bool loadMedia()
 		gPowerupClips[3].h = 20;
 	}
     
+	//Open the font
+	gFont = TTF_OpenFont( "lazy.ttf", 28 );
+	if( gFont == NULL )
+	{
+		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
+		success = false;
+	}
+	else
+	{
+		//Render text
+		SDL_Color textColor = { 0, 0, 0 };
+		if( !gTextTexture.loadFromRenderedText( "The quick brown fox jumps over the lazy dog", textColor, gRenderer, gFont ) )
+		{
+			printf( "Failed to render text texture!\n" );
+			success = false;
+		}
+	}
+
     return success;
 }
 
@@ -366,6 +400,16 @@ int main( int argc, char* args[] )
 				{
 					frame = 0;
 				}
+
+				//update text
+				SDL_Color textColor = { 0, 0, 0 };
+				std::stringstream ss;
+				ss << dot.getPosX() << ", " << dot.getPosY();
+				std::string str = ss.str();
+				gTextTexture.loadFromRenderedText( str, textColor, gRenderer, gFont);
+				//Render current frame
+				//gTextTexture.render( ( SCREEN_WIDTH - gTextTexture.getWidth() ) - 10 , ( SCREEN_HEIGHT - gTextTexture.getHeight() ) - 10 );
+				gTextTexture.render( 0, 0 );
 
                 //Update screen
                 SDL_RenderPresent( gRenderer );

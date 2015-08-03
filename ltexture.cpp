@@ -1,8 +1,10 @@
 #include <SDL2/SDL.h>
 #ifdef __linux__
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #else __APPLE__ && __MACH__ 	
 #include <SDL2_image/SDL_image.h>
+#include <SDL2_ttf/SDL_ttf.h>
 #endif
 #include <stdio.h>
 #include <string>
@@ -74,7 +76,7 @@ bool LTexture::loadFromFile( std::string path, SDL_Renderer* gRenderer )
 }
 
 #ifdef _SDL_TTF_H
-bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor, SDL_Renderer* gRenderer )
+bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor, SDL_Renderer* gRenderer, TTF_Font* gFont )
 {
     //Get rid of preexisting texture
     free();
