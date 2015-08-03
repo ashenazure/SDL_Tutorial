@@ -217,15 +217,19 @@ void close()
     //Free loaded images
     gDotTexture.free();
     gBGTexture.free(); // bg
+	gPowerupTexture.free();
+	gTextTexture.free();
     
     //Destroy window
     SDL_DestroyRenderer( gRenderer );
     SDL_DestroyWindow( gWindow );
     gWindow = NULL;
     gRenderer = NULL;
+	gFont = NULL;
     
     //Quit SDL subsystems
     IMG_Quit();
+	TTF_Quit();
     SDL_Quit();
 }
 
