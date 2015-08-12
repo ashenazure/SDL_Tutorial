@@ -44,7 +44,7 @@ SDL_Renderer* gRenderer = NULL;
 //Globally used font
 TTF_Font *gFont = NULL;
 
-//Text texture
+//Text texture for coordinates
 LTexture gTextTexture;
 
 //Scene textures
@@ -405,7 +405,7 @@ int main( int argc, char* args[] )
 					frame = 0;
 				}
 
-				//update text
+				//update coordinate text
 				SDL_Color textColor = { 0, 0, 0 };
 				std::stringstream ss;
 				ss << dot.getPosX() << ", " << dot.getPosY();
