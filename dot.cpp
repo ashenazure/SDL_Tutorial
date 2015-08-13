@@ -121,6 +121,17 @@ int Dot::move( Wall wall[] )
         }
     }
     
+    if (wallCollidedWith != -1) {
+        if ( wall[wallCollidedWith].getVel() != 0 ) {
+            if ( wall[wallCollidedWith].getDir() ) {
+                mPosX -= 2*wall[wallCollidedWith].getVel();
+            }
+            else {
+                mPosX += 2*wall[wallCollidedWith].getVel();
+            }
+        }
+    }
+    
     //If the dot collided or went too far up or down
     if( ( mPosY < 0 ) )
     {

@@ -192,6 +192,8 @@ void close()
     SDL_DestroyWindow( gWindow );
     gWindow = NULL;
     gRenderer = NULL;
+    gPowerupTexture = NULL;
+    gWallTexture = NULL;
     
     //Quit SDL subsystems
     IMG_Quit();
@@ -264,7 +266,7 @@ int main( int argc, char* args[] )
             wall[2] = Wall(&gWallTexture, 300, 140, 40, 160);
             wall[3] = Wall(&gWallTexture, 0, 460, 600, 20);
             wall[4] = Wall(&gWallTexture, 300, 430, 30, 30);
-            wall[5] = Wall(&gWallTexture, 800, 450, 400, 50);
+            wall[5] = Wall(&gWallTexture, 800, 450, 400, 50, 0, 1, 400);
             wall[6] = Wall(&gWallTexture, 100, 800, 400, 50);
             wall[7] = Wall(&gWallTexture, 0, 940, 600, 20);
             wall[8] = Wall(&gWallTexture, 600, 650, 100, 100);
@@ -289,6 +291,9 @@ int main( int argc, char* args[] )
                 
                 //Move the dot and check collision
                 a = dot.move( wall );
+                for (int i = 0; i < numWalls; i++) {
+                    wall[i].move();
+                }
                 
                 //Center the camera over the dot
                 camera.x = ( dot.getPosX() + Dot::DOT_WIDTH / 2 ) - SCREEN_WIDTH / 2;

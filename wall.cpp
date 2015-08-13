@@ -45,13 +45,13 @@ Wall::Wall(LTexture* texture, int x, int y, int w, int h)
     gWallTexture = texture;
 }
 
-Wall::Wall(int x, int y, int w, int h, int movement, int speed, int turns)
+Wall::Wall(LTexture* texture, int x, int y, int w, int h, int movement, int speed, int turns)
 {
     myWall.x = x;
     myWall.y = y;
     myWall.w = w;
     myWall.h = h;
-    moveType = movement;
+    moveType = movement; // 0 for horizontal, 1 for vertical
     vel = speed;
     end = turns;
     wayBack = false;
@@ -66,6 +66,7 @@ Wall::Wall(int x, int y, int w, int h, int movement, int speed, int turns)
         end = start;
         start = turns;
     }
+    gWallTexture = texture;
 }
 
 void Wall::move()
@@ -138,4 +139,12 @@ int Wall::getW() {
 
 int Wall::getH() {
     return myWall.h;
+}
+
+int Wall::getVel() {
+    return vel;
+}
+
+bool Wall::getDir() {
+    return wayBack;
 }

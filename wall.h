@@ -20,7 +20,7 @@ public:
     Wall(LTexture* texture, int x, int y, int w, int h);
     
     //Extra features
-    Wall(int x, int y, int w, int h, int movement, int speed, int turns);
+    Wall(LTexture* texture, int x, int y, int w, int h, int movement, int speed, int turns);
     
     //Moves the dot and checks collision
     void move();
@@ -33,6 +33,8 @@ public:
     int getY();
     int getW();
     int getH();
+    int getVel();
+    bool getDir();
     
 private:
     
