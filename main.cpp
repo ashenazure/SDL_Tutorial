@@ -4,12 +4,13 @@
 //Using SDL, SDL_image, standard IO, and strings
 #ifdef __linux__
 #include <SDL2/SDL_image.h>
-#else __APPLE__ && __MACH__ 	
+#else
 #include <SDL2_image/SDL_image.h>
 #endif
 #include <stdio.h>
 #include <string>
 #include "ltexture.h"
+#include "wall.h"
 #include "dot.h"
 
 //The dimensions of the level
@@ -21,7 +22,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 //Set the wall
-SDL_Rect wall[10];
+Wall wall[10];
 int numWalls = 0;
 bool win = false;
 bool lose = false;
@@ -41,6 +42,7 @@ SDL_Renderer* gRenderer = NULL;
 //Scene textures
 LTexture gDotTexture;
 LTexture gBGTexture;
+LTexture gWallTexture;
 
 //powerup animation
 const int POWERUP_ANIMATION_FRAMES = 4;
@@ -100,6 +102,7 @@ bool init()
 				gDotTexture.setRenderer(gRenderer);
 				gBGTexture.setRenderer(gRenderer);
 				gPowerupTexture.setRenderer(gRenderer);
+                gWallTexture.setRenderer(gRenderer);
                 
                 //Initialize PNG loading
                 int imgFlags = IMG_INIT_PNG;
@@ -189,20 +192,12 @@ void close()
     SDL_DestroyWindow( gWindow );
     gWindow = NULL;
     gRenderer = NULL;
+    gPowerupTexture = NULL;
+    gWallTexture = NULL;
     
     //Quit SDL subsystems
     IMG_Quit();
     SDL_Quit();
-}
-
-
-void setWalls( int x, int y, int w, int h )
-{
-    wall[numWalls].x = x;
-    wall[numWalls].y = y;
-    wall[numWalls].w = w;
-    wall[numWalls].h = h;
-    numWalls += 1;
 }
 
 SDL_Surface* loadSurface( std::string path )
@@ -250,7 +245,6 @@ int main( int argc, char* args[] )
         {
             //Main loop flag
             bool quit = false;
-            bool positive = true;
             int a;
 
 			//animation frame
@@ -267,15 +261,16 @@ int main( int argc, char* args[] )
             SDL_Rect bgcam = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
             
             //Set the wall
-            setWalls(40, 300, 400, 40);
-            setWalls(80, 100, 400, 40);
-            setWalls(300, 140, 40, 160);
-            setWalls(0, 460, 600, 20);
-            setWalls(300, 430, 30, 30);
-            setWalls(800, 450, 400, 50);
-            setWalls(100, 800, 400, 50);
-            setWalls(0, 940, 600, 20);
-            setWalls(600, 650, 100, 100);
+            wall[0] = Wall(&gWallTexture, 40, 300, 400, 40);
+            wall[1] = Wall(&gWallTexture, 80, 100, 400, 40);
+            wall[2] = Wall(&gWallTexture, 300, 140, 40, 160);
+            wall[3] = Wall(&gWallTexture, 0, 460, 600, 20);
+            wall[4] = Wall(&gWallTexture, 300, 430, 30, 30);
+            wall[5] = Wall(&gWallTexture, 800, 450, 400, 50, 0, 1, 400);
+            wall[6] = Wall(&gWallTexture, 100, 800, 400, 50);
+            wall[7] = Wall(&gWallTexture, 0, 940, 600, 20);
+            wall[8] = Wall(&gWallTexture, 600, 650, 100, 100);
+            numWalls = 9;
             //setWalls(20, 0, 1280, 20);
             
             //While application is running
@@ -296,19 +291,8 @@ int main( int argc, char* args[] )
                 
                 //Move the dot and check collision
                 a = dot.move( wall );
-
-				//Move wall #5
-                if ( wall[5].x <= 200 ) {
-                    positive = true;
-                }
-                else if ( wall[5].x >= 1000 ) {
-                    positive = false;
-                }
-                if ( positive ) {
-                    wall[5].x += 1;
-                }
-                else {
-                    wall[5].x -= 1;
+                for (int i = 0; i < numWalls; i++) {
+                    wall[i].move();
                 }
                 
                 //Center the camera over the dot
@@ -343,12 +327,7 @@ int main( int argc, char* args[] )
                 //Render wall
                 SDL_SetRenderDrawColor( gRenderer, 0x00, 0x00, 0x00, 0xFF );
                 for (int i = 0; i < numWalls; i++) {
-                    wall[i].x -= camera.x;
-                    wall[i].y -= camera.y;
-                    SDL_RenderDrawRect( gRenderer, &wall[i] );
-                    SDL_RenderFillRect( gRenderer, &wall[i] );
-                    wall[i].x += camera.x;
-                    wall[i].y += camera.y;
+                    wall[i].render( camera.x, camera.y );
                 }
                 
                 //Render dot

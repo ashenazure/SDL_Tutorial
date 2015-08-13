@@ -1,12 +1,13 @@
 #include <SDL2/SDL.h>
 #ifdef __linux__
 #include <SDL2/SDL_image.h>
-#else __APPLE__ && __MACH__ 	
+#else
 #include <SDL2_image/SDL_image.h>
 #endif
 #include <stdio.h>
 #include <string>
 #include "ltexture.h"
+#include "wall.h"
 #include "dot.h"
 
 Dot::Dot()
@@ -64,11 +65,11 @@ void Dot::handleEvent( SDL_Event& e )
                     inAir = 2;
                 }
                 break;
-        ////case SDLK_DOWN: 
-		////	if ( inAir > 0 ) {
-		////		mVelY += 5;
-		////	}
-		////	break;
+        case SDLK_DOWN:
+			if ( inAir > 0 ) {
+				mVelY += 5;
+			}
+			break;
             case SDLK_LEFT: mVelX -= DOT_VEL; break;
             case SDLK_RIGHT: mVelX += DOT_VEL; break;
         }
@@ -87,7 +88,7 @@ void Dot::handleEvent( SDL_Event& e )
     }
 }
 
-int Dot::move( SDL_Rect wall[] )
+int Dot::move( Wall wall[] )
 {
     //Move the dot left or right
     mPosX += mVelX;
@@ -120,6 +121,17 @@ int Dot::move( SDL_Rect wall[] )
         }
     }
     
+    if (wallCollidedWith != -1) {
+        if ( wall[wallCollidedWith].getVel() != 0 ) {
+            if ( wall[wallCollidedWith].getDir() ) {
+                mPosX -= 2*wall[wallCollidedWith].getVel();
+            }
+            else {
+                mPosX += 2*wall[wallCollidedWith].getVel();
+            }
+        }
+    }
+    
     //If the dot collided or went too far up or down
     if( ( mPosY < 0 ) )
     {
@@ -130,10 +142,10 @@ int Dot::move( SDL_Rect wall[] )
     }
     else if ( collidedY ) {
         if ( mVelY < 0) { // upward collision
-            mPosY = wall[wallCollidedWith].y + wall[wallCollidedWith].h;
+            mPosY = wall[wallCollidedWith].getY() + wall[wallCollidedWith].getH();
         }
         else if ( mVelY > 0 ) { // downward collision
-            mPosY = wall[wallCollidedWith].y - DOT_HEIGHT;
+            mPosY = wall[wallCollidedWith].getY() - DOT_HEIGHT;
             inAir = 0;
         }
         mCollider.y = mPosY;
@@ -168,7 +180,7 @@ int Dot::getPosY()
     return mPosY;
 }
 
-bool Dot::checkCollision( SDL_Rect a, SDL_Rect b )
+bool Dot::checkCollision( SDL_Rect a, Wall b )
 {
     //The sides of the rectangles
     int leftA, leftB;
@@ -183,10 +195,10 @@ bool Dot::checkCollision( SDL_Rect a, SDL_Rect b )
     bottomA = a.y + a.h;
     
     //Calculate the sides of rect B
-    leftB = b.x;
-    rightB = b.x + b.w;
-    topB = b.y;
-    bottomB = b.y + b.h;
+    leftB = b.getX();
+    rightB = b.getX() + b.getW();
+    topB = b.getY();
+    bottomB = b.getY() + b.getH();
     
     //If any of the sides from A are outside of B
     if( bottomA <= topB )
