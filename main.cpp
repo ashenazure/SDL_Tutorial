@@ -9,6 +9,8 @@
 #include <SDL2_image/SDL_image.h>
 #include <SDL2_ttf/SDL_ttf.h>
 #endif
+#include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <sstream>
 #include <string>
@@ -25,7 +27,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
 //Set the wall
-Wall wall[10];
+Wall wall[100];
 int numWalls = 0;
 bool win = false;
 bool lose = false;
@@ -299,6 +301,17 @@ int main( int argc, char* args[] )
             SDL_Rect bgcam = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
             
             //Set the wall
+			int wallsCreated = 0;
+			std::fstream myfile("walldata.txt", std::ios_base::in);
+
+			int wa, wb, wc, wd, we, wf, wg;
+			while(myfile >> wa >> wb >> wc >> wd >> we >> wf >> wg)
+			{
+				wall[wallsCreated] = Wall(&gWallTexture, wa, wb, wc, wd, we, wf, wg);
+				wallsCreated++;
+			}
+			numWalls = wallsCreated;
+			/* old
             wall[0] = Wall(&gWallTexture, 40, 300, 400, 40);
             wall[1] = Wall(&gWallTexture, 80, 100, 400, 40);
             wall[2] = Wall(&gWallTexture, 300, 140, 40, 160);
@@ -310,6 +323,7 @@ int main( int argc, char* args[] )
             wall[8] = Wall(&gWallTexture, 600, 650, 100, 100);
             numWalls = 9;
             //setWalls(20, 0, 1280, 20);
+			*/
             
             //While application is running
             while( !quit )
